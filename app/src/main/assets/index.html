@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0e27">
+    <title>Delta Key Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 20px;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .logo {
+            width: 88px;
+            height: 88px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            100% { transform: translateX(100%) translateY(100%); }
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #8b92b8;
+            font-weight: 400;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            max-width: 420px;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px 24px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-icon {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .status-box {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .status-label {
+            font-size: 11px;
+            color: #8b92b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #d4d8f0;
+            word-break: break-word;
+            font-family: 'SF Mono', Monaco, Menlo, monospace;
+            line-height: 1.5;
+        }
+
+        .status-text.success {
+            color: #4ade80;
+        }
+
+        .status-text.error {
+            color: #f87171;
+        }
+
+        .status-text.loading {
+            color: #fbbf24;
+        }
+
+        .link-box {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .link-box.visible {
+            display: flex;
+        }
+
+        .link-label {
+            font-size: 11px;
+            color: #a5b4fc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .link-url {
+            font-size: 13px;
+            color: #ffffff;
+            word-break: break-all;
+            font-family: 'SF Mono', Monaco, Menlo, monospace;
+            line-height: 1.5;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .link-action-btn {
+            flex: 1;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .link-action-btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-copy {
+            background: #6366f1;
+            color: white;
+        }
+
+        .btn-open {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            margin-top: auto;
+            padding-top: 24px;
+            text-align: center;
+            font-size: 11px;
+            color: #555c80;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .hwid-box {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hwid-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hwid-label {
+            font-size: 10px;
+            color: #8b92b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .hwid-value {
+            font-size: 12px;
+            color: #d4d8f0;
+            font-family: 'SF Mono', Monaco, Menlo, monospace;
+            word-break: break-all;
+            line-height: 1.3;
+        }
+
+        .hwid-copy {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        .hwid-copy:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">D</div>
+        <div class="title">Delta Key Generator</div>
+        <div class="subtitle">Platoboost Link Generator</div>
+    </div>
+
+    <div class="hwid-box">
+        <div class="hwid-info">
+            <div class="hwid-label">Current HWID</div>
+            <div class="hwid-value" id="currentHwid">Not generated yet</div>
+        </div>
+        <button class="hwid-copy" onclick="copyHwid()">Copy</button>
+    </div>
+
+    <div class="buttons">
+        <button class="btn btn-primary" id="btnGetKey" onclick="getKey(true)">
+            <span class="btn-icon">🔑</span>
+            <span>Get Key (Device HWID)</span>
+        </button>
+        <button class="btn btn-secondary" id="btnRandomKey" onclick="getKey(false)">
+            <span class="btn-icon">🎲</span>
+            <span>Random Key</span>
+        </button>
+    </div>
+
+    <div class="status-box">
+        <div class="status-label">Status</div>
+        <div class="status-text" id="status">Ready. Tap a button to generate a link.</div>
+    </div>
+
+    <div class="link-box" id="linkBox">
+        <div class="link-label">Generated Link</div>
+        <div class="link-url" id="linkUrl">-</div>
+        <div class="link-actions">
+            <button class="link-action-btn btn-copy" onclick="copyLink()">📋 Copy</button>
+            <button class="link-action-btn btn-open" onclick="openLink()">🔗 Open</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        Delta Key Generator v1.0<br>
+        Service ID: 6 (Delta)
+    </div>
+
+    <script>
+        const SERVICE_ID = 6;
+        const STORAGE_KEY_HWID = 'delta_hwid';
+        const HOSTS = [
+            'https://api.platoboost.com',
+            'https://api.platoboost.net'
+        ];
+
+        // Crypto polyfill for WebView (uses JS implementation if Web Crypto isn't available)
+        function sha256Hex(message) {
+            // Use Web Crypto API (available in modern WebView)
+            return new Promise((resolve, reject) => {
+                if (window.crypto && window.crypto.subtle) {
+                    const encoder = new TextEncoder();
+                    window.crypto.subtle.digest('SHA-256', encoder.encode(message))
+                        .then(hashBuffer => {
+                            const hashArray = Array.from(new Uint8Array(hashBuffer));
+                            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                            resolve(hashHex);
+                        })
+                        .catch(reject);
+                } else {
+                    // Fallback: simple JS SHA-256
+                    reject(new Error('Web Crypto API not available'));
+                }
+            });
+        }
+
+        function randomHex(bytes) {
+            const arr = new Uint8Array(bytes);
+            window.crypto.getRandomValues(arr);
+            return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Persistent device HWID (stored in localStorage, equivalent to the user's ~/.platoboost_identifier file)
+        async function getDeviceHwid() {
+            let stored = localStorage.getItem(STORAGE_KEY_HWID);
+            if (stored) return stored;
+
+            // Generate a stable per-device identifier
+            // Combine random bytes + device info available in WebView
+            const deviceInfo = [
+                navigator.userAgent,
+                navigator.language,
+                screen.width + 'x' + screen.height,
+                new Date().getTimezoneOffset().toString(),
+                navigator.hardwareConcurrency || '4'
+            ].join('|');
+
+            const random = randomHex(32);
+            const hash = await sha256Hex(random + '|' + deviceInfo);
+            localStorage.setItem(STORAGE_KEY_HWID, hash);
+            return hash;
+        }
+
+        // Random one-time HWID (not persisted)
+        async function getRandomHwid() {
+            const random = randomHex(32);
+            return await sha256Hex(random);
+        }
+
+        async function findWorkingHost() {
+            for (const host of HOSTS) {
+                try {
+                    const response = await fetch(host + '/public/connectivity', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'User-Agent': 'Platoboost Android Client/1.0'
+                        },
+                        signal: AbortSignal.timeout(5000)
+                    });
+                    if (response.ok) return host;
+                } catch (e) {
+                    // try next
+                }
+            }
+            throw new Error('Could not connect to Platoboost API');
+        }
+
+        async function generateLink(identifier) {
+            const hostname = await findWorkingHost();
+            const response = await fetch(hostname + '/public/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'User-Agent': 'Platoboost Android Client/1.0'
+                },
+                body: JSON.stringify({
+                    service: SERVICE_ID,
+                    identifier: identifier
+                }),
+                signal: AbortSignal.timeout(10000)
+            });
+
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+
+            const data = await response.json();
+            if (!data.success || !data.data || !data.data.url) {
+                throw new Error('API returned failure');
+            }
+            return data.data.url;
+        }
+
+        let isGenerating = false;
+
+        async function getKey(useDeviceHwid) {
+            if (isGenerating) return;
+            isGenerating = true;
+
+            const btnGet = document.getElementById('btnGetKey');
+            const btnRandom = document.getElementById('btnRandomKey');
+            const status = document.getElementById('status');
+            const linkBox = document.getElementById('linkBox');
+            const hwidDisplay = document.getElementById('currentHwid');
+
+            btnGet.disabled = true;
+            btnRandom.disabled = true;
+            linkBox.classList.remove('visible');
+
+            try {
+                status.className = 'status-text loading';
+                status.innerHTML = '<span class="spinner"></span> Generating HWID...';
+
+                const identifier = useDeviceHwid
+                    ? await getDeviceHwid()
+                    : await getRandomHwid();
+
+                hwidDisplay.textContent = identifier;
+
+                status.innerHTML = '<span class="spinner"></span> Connecting to Platoboost...';
+
+                const url = await generateLink(identifier);
+
+                status.className = 'status-text success';
+                status.textContent = '✓ Link generated successfully!';
+
+                document.getElementById('linkUrl').textContent = url;
+                linkBox.classList.add('visible');
+
+            } catch (err) {
+                status.className = 'status-text error';
+                status.textContent = '✗ ' + (err.message || 'Unknown error');
+            } finally {
+                btnGet.disabled = false;
+                btnRandom.disabled = false;
+                isGenerating = false;
+            }
+        }
+
+        function copyLink() {
+            const url = document.getElementById('linkUrl').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = event.target.closest('button');
+                const original = btn.innerHTML;
+                btn.innerHTML = '✓ Copied!';
+                setTimeout(() => { btn.innerHTML = original; }, 1500);
+            }).catch(() => {
+                // Fallback for older WebView
+                const ta = document.createElement('textarea');
+                ta.value = url;
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (e) {}
+                document.body.removeChild(ta);
+                const btn = event.target.closest('button');
+                const original = btn.innerHTML;
+                btn.innerHTML = '✓ Copied!';
+                setTimeout(() => { btn.innerHTML = original; }, 1500);
+            });
+        }
+
+        function copyHwid() {
+            const hwid = document.getElementById('currentHwid').textContent;
+            if (hwid === 'Not generated yet') return;
+            navigator.clipboard.writeText(hwid).then(() => {
+                const btn = event.target;
+                const original = btn.textContent;
+                btn.textContent = '✓';
+                setTimeout(() => { btn.textContent = original; }, 1500);
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = hwid;
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); } catch (e) {}
+                document.body.removeChild(ta);
+                const btn = event.target;
+                const original = btn.textContent;
+                btn.textContent = '✓';
+                setTimeout(() => { btn.textContent = original; }, 1500);
+            });
+        }
+
+        function openLink() {
+            const url = document.getElementById('linkUrl').textContent;
+            if (url && url !== '-') {
+                window.open(url, '_blank');
+            }
+        }
+
+        // Initialize - show device HWID on load
+        (async function init() {
+            try {
+                const hwid = await getDeviceHwid();
+                document.getElementById('currentHwid').textContent = hwid;
+            } catch (e) {
+                // ignore
+            }
+        })();
+    </script>
+</body>
+</html>
